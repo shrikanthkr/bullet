@@ -7,11 +7,11 @@ import java.lang.annotation.Target;
 
 /**
  * Created by shrikanth on 8/20/17.
- * 
+ *
  */
 
 @Target(ElementType.METHOD)
-@Retention(RetentionPolicy.CLASS)
+@Retention(RetentionPolicy.SOURCE)
 public @interface Subscribe {
     String id();
 }
