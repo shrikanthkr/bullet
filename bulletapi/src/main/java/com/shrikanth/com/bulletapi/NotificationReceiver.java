@@ -11,7 +11,7 @@ public abstract class NotificationReceiver<T> {
         this.listener = listener;
     }
 
-    public abstract void handleNotification(Object data);
+    public abstract void handleNotification(String id, Object data);
 
 
 }

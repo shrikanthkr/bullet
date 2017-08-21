@@ -9,6 +9,8 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +40,20 @@ public class OwnerClass {
         this.typeUtils = typeUtils;
         this.elementUtils = elementUtils;
         this.originalClassName =  classElement.getSimpleName().toString();
+        this.receiverMethods = new HashMap<>();
     }
+
+    public void addMethod(AnnotatedMethod method){
+        List<AnnotatedMethod> methods;
+        if(!receiverMethods.containsKey(method.getNotificationId())){
+            methods = new ArrayList<>();
+            receiverMethods.put(method.getNotificationId(), methods);
+        }else{
+            methods = receiverMethods.get(method.getNotificationId());
+        }
+        methods.add(method);
+    }
+
 
     public void writeCode(){
         String className = originalClassName + SUFFIX;
@@ -85,8 +100,15 @@ public class OwnerClass {
          */
         MethodSpec.Builder handleNotification = MethodSpec.methodBuilder("handleNotification")
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(Object.class, "data")
-                .addStatement("listener.onLogin()");
+                .addParameter(String.class, "id")
+                .addParameter(Object.class, "data");
+        handleNotification.beginControlFlow("switch(id)");
+        for (String id : receiverMethods.keySet()) {
+            handleNotification.addCode("case $S:\n", id);
+            
+            handleNotification.addStatement("break");
+        }
+        handleNotification.endControlFlow();
 
         builder.addMethod(handleNotification.build());
 

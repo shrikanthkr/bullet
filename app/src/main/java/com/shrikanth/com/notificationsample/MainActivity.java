@@ -1,7 +1,8 @@
 package com.shrikanth.com.notificationsample;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+
 import com.shrikanth.com.bulletapi.Subscribe;
 public class MainActivity extends AppCompatActivity {
 
@@ -13,5 +14,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Subscribe(id ="login")
     public void onLogin(){}
+
+    @Subscribe(id ="sing")
+    public Object onSing(String songId){
+        return null;
+    }
 
 }
