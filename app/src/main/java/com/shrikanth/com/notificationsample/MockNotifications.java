@@ -27,6 +27,7 @@ public class MockNotifications {
                     @Override
                     public void run() {
                         NotificationApi.notify("complexObject", new User());
+                        NotificationApi.notify("primitive",3);
                     }
                 }, 2000);
             }

@@ -55,4 +55,9 @@ public class MainActivity extends BaseActivity {
         return null;
     }
 
+    @Subscribe(id ="Onprimitive", sticky = true)
+    public Object onPrimitive(int prim){
+        return null;
+    }
+
 }

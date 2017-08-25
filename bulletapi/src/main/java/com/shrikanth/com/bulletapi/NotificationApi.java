@@ -69,10 +69,12 @@ public class NotificationApi {
     }
 
     public static void notify(String id, Object data){
-        HashSet<String> subscribers = mSubscribersByNotificationId.get(id);
-        for (String subscriberId : subscribers) {
-            Subscriber subscriber = mSubscribersByID.get(subscriberId);
-            subscriber.notify(id, data);
+        if( mSubscribersByNotificationId.containsKey(id)){
+            HashSet<String> subscribers = mSubscribersByNotificationId.get(id);
+            for (String subscriberId : subscribers) {
+                Subscriber subscriber = mSubscribersByID.get(subscriberId);
+                subscriber.notify(id, data);
+            }
         }
     }
 
