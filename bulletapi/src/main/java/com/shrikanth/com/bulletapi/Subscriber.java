@@ -3,6 +3,7 @@ package com.shrikanth.com.bulletapi;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -40,6 +41,14 @@ class Subscriber {
             e.printStackTrace();
         }
         this.currentState = STATE.ALIVE;
+    }
+
+    HashSet getSubscriptions(){
+        return notificationReceiver.getSubscriptions();
+    }
+
+    String getId() {
+        return id;
     }
 
     void notify(String id, Object data){

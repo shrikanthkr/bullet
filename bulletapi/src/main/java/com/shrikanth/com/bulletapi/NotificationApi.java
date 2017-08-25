@@ -1,7 +1,7 @@
 package com.shrikanth.com.bulletapi;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -13,7 +13,7 @@ public class NotificationApi {
     private static final Object mLock = new Object();
     private static NotificationApi INSTANCE;
     private static Map<String, Subscriber> mSubscribersByID = new HashMap<>();
-    private static Map<String, List<Subscriber>> mSubscribersByNotificationId = new HashMap<>();
+    private static Map<String, HashSet<String>> mSubscribersByNotificationId = new HashMap<>();
 
 
     /*
@@ -43,6 +43,7 @@ public class NotificationApi {
                 subscriber = new Subscriber(id, receiver);
             }
             mSubscribersByID.put(id, subscriber);
+            addByNotificationIds(subscriber);
         }
     }
 
@@ -59,6 +60,7 @@ public class NotificationApi {
             unRegister(receiverID);
             subscriber.destroy();
             mSubscribersByID.remove(receiverID);
+            removeFromNotificationsIds(receiverID);
         }
     }
 
@@ -67,15 +69,33 @@ public class NotificationApi {
     }
 
     public static void notify(String id, Object data){
-        List<Subscriber> subscribers = mSubscribersByNotificationId.get(id);
-        for (Subscriber subscriber : subscribers) {
-           subscriber.notify(id, data);
+        HashSet<String> subscribers = mSubscribersByNotificationId.get(id);
+        for (String subscriberId : subscribers) {
+            Subscriber subscriber = mSubscribersByID.get(subscriberId);
+            subscriber.notify(id, data);
         }
     }
 
 
 
-    private void addToSubscriptions(String receiverID){
+    private void addByNotificationIds(Subscriber subscriber){
+        HashSet<String> subscriptions = subscriber.getSubscriptions();
+        for(String id : subscriptions){
+            HashSet<String> subscriberIds;
+            if(mSubscribersByNotificationId.containsKey(id)){
+                subscriberIds = mSubscribersByNotificationId.get(id);
+            }else{
+                subscriberIds = new HashSet<>();
+                mSubscribersByNotificationId.put(id, subscriberIds);
+            }
+            subscriberIds.add(subscriber.getId());
+        }
+    }
 
+    private void removeFromNotificationsIds(String receiverId){
+        for (Map.Entry<String, HashSet<String>> entry : mSubscribersByNotificationId.entrySet()) {
+            HashSet<String> subscriberIds = entry.getValue();
+            subscriberIds.remove(receiverId);
+        }
     }
 }
