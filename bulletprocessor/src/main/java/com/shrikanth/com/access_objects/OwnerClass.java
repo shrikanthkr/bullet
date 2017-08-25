@@ -99,9 +99,8 @@ public class OwnerClass {
             for (AnnotatedMethod method: methods) {
                 if(method.isSticky()){
                     constructor.addStatement("stickySubscriptions.add($S)", method.getNotificationId());
-                }else{
-                    constructor.addStatement("subscriptions.add($S)", method.getNotificationId());
                 }
+                constructor.addStatement("subscriptions.add($S)", method.getNotificationId());
             }
         }
         builder.addMethod(constructor.build());

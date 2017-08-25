@@ -1,7 +1,6 @@
 package com.shrikanth.com.bulletapi;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -13,9 +12,9 @@ public class NotificationApi {
 
     private static final Object mLock = new Object();
     private static NotificationApi INSTANCE;
-    private Map<String, Subscriber> mSubscribersByID = new HashMap<>();
-    private Map<String, List<Subscriber>> mSubscribersByNotificationId = new HashMap<>();
-    private Map<String, HashSet<String>> stickyEvents = new HashMap<>();
+    private static Map<String, Subscriber> mSubscribersByID = new HashMap<>();
+    private static Map<String, List<Subscriber>> mSubscribersByNotificationId = new HashMap<>();
+
 
     /*
     Avoid exposing the constructor for initialization
@@ -35,7 +34,14 @@ public class NotificationApi {
 
     public void register(Object receiver, String id){
         synchronized (mLock){
-            Subscriber subscriber = new Subscriber(id, receiver);
+            Subscriber subscriber;
+            if(mSubscribersByID.containsKey(id)){
+                subscriber = mSubscribersByID.get(id);
+                subscriber.bindSubscriber(receiver);
+                subscriber.sendPendingNotifications();
+            }else {
+                subscriber = new Subscriber(id, receiver);
+            }
             mSubscribersByID.put(id, subscriber);
         }
     }
@@ -43,20 +49,33 @@ public class NotificationApi {
     public void unRegister(String receiverID){
         synchronized (mLock) {
             Subscriber subscriber = mSubscribersByID.get(receiverID);
-            subscriber.cleanup();
-            mSubscribersByID.remove(receiverID);
-
+            subscriber.unregister();
         }
     }
 
-    public void completeDestroy(String receiverID){
+    public void destroy(String receiverID){
         synchronized (mLock) {
+            Subscriber subscriber = mSubscribersByID.get(receiverID);
             unRegister(receiverID);
-            removeFromSticky(receiverID);
+            subscriber.destroy();
+            mSubscribersByID.remove(receiverID);
         }
     }
 
-    private void removeFromSticky(String receiverID){
+    public static void notify(String id){
+        notify(id, null);
+    }
+
+    public static void notify(String id, Object data){
+        List<Subscriber> subscribers = mSubscribersByNotificationId.get(id);
+        for (Subscriber subscriber : subscribers) {
+           subscriber.notify(id, data);
+        }
+    }
+
+
+
+    private void addToSubscriptions(String receiverID){
 
     }
 }

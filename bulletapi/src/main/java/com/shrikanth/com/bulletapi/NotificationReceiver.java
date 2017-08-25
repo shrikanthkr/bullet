@@ -1,7 +1,6 @@
 package com.shrikanth.com.bulletapi;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
 /**
  * Created by shrikanth on 8/20/17.
@@ -9,22 +8,26 @@ import java.util.List;
 
 public abstract class NotificationReceiver<T> {
     protected T listener;
-    protected List<String> subscriptions;
-    protected List<String> stickySubscriptions;
+    protected HashSet<String> subscriptions;
+    protected HashSet<String> stickySubscriptions;
 
     public NotificationReceiver(T listener) {
         this.listener = listener;
-        this.subscriptions = new ArrayList<>();
-        this.stickySubscriptions = new ArrayList<>();
+        this.subscriptions = new HashSet<>();
+        this.stickySubscriptions = new HashSet<>();
     }
 
     public abstract void handleNotification(String id, Object data);
 
-    public List<String> getSubscriptions(){
+    public HashSet<String> getSubscriptions(){
         return subscriptions;
     }
 
-    public List<String> getStickySubscriptions() {
+    public HashSet<String> getStickySubscriptions() {
         return stickySubscriptions;
+    }
+
+    public boolean isSticky(String id){
+        return  stickySubscriptions.contains(id);
     }
 }
