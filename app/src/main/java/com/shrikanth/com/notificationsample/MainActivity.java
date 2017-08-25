@@ -26,11 +26,21 @@ public class MainActivity extends BaseActivity {
     private void callUserCheck(User u){}
 
     @Subscribe(id ="login")
-    public void onLogin(){
+    public void onLogin(final String message){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(MainActivity.this, "Login called", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @Subscribe(id ="login")
+    public void somthingElse(final String message){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
             }
         });
     }
