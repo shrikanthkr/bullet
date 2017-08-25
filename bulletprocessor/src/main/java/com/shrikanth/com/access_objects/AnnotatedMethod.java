@@ -49,7 +49,7 @@ public class AnnotatedMethod {
     public String getCode(){
         CodeBlock.Builder codeBlock = CodeBlock.builder();
         if(parameterTypes != null && parameterTypes.size() > 0) {
-            codeBlock.beginControlFlow("if($L instanceof $L)", "data", parameterTypes.get(0).toString());
+            codeBlock.beginControlFlow("if($L instanceof $L \n || $L == null)", "data", parameterTypes.get(0).toString(), "data");
             codeBlock.addStatement("listener.$L(($L)$L)", methodName, parameterTypes.get(0).toString(), "data");
             codeBlock.endControlFlow();
         }else{
