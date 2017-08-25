@@ -1,8 +1,14 @@
 package com.shrikanth.com.access_objects;
 
+
 import com.shrikanth.com.bulletapi.Subscribe;
+import com.squareup.javapoet.CodeBlock;
+
+import java.util.List;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.type.ExecutableType;
+import javax.lang.model.type.TypeMirror;
 
 /**
  * Created by shrikanth on 8/20/17.
@@ -11,15 +17,20 @@ import javax.lang.model.element.Element;
 public class AnnotatedMethod {
 
     Element element;
+    ExecutableType executableType;
     String methodName;
     Subscribe annotation;
     //String[] params;
-
+    List<? extends TypeMirror> parameterTypes;
 
     public AnnotatedMethod(Element element) {
-        this.element = element;
-        this.methodName = element.getSimpleName().toString();
-        annotation = element.getAnnotation(Subscribe.class);
+        if(element.asType() instanceof ExecutableType) {
+            this.element = element;
+            this.executableType = (ExecutableType)element.asType();
+            this.parameterTypes = executableType.getParameterTypes();
+            this.methodName = element.getSimpleName().toString();
+            annotation = element.getAnnotation(Subscribe.class);
+        }
     }
 
 
@@ -27,7 +38,24 @@ public class AnnotatedMethod {
         return annotation.id();
     }
 
+    public boolean isSticky(){
+        return annotation.sticky();
+    }
+
     public String getMethodName() {
         return methodName;
+    }
+
+    public String getCode(){
+        CodeBlock.Builder codeBlock = CodeBlock.builder();
+        if(parameterTypes != null && parameterTypes.size() > 0) {
+            codeBlock.beginControlFlow("if($L instanceof $L)", "data", parameterTypes.get(0).toString());
+            codeBlock.addStatement("listener.$L(($L)$L)", methodName, parameterTypes.get(0).toString(), "data");
+            codeBlock.endControlFlow();
+        }else{
+            codeBlock.addStatement("listener.$L()", methodName);
+        }
+
+        return codeBlock.build().toString();
     }
 }

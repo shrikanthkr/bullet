@@ -79,6 +79,7 @@ public class OwnerClass {
           Creating the class with proper class name
          */
         TypeSpec.Builder builder = TypeSpec.classBuilder(className);
+        builder.addModifiers(Modifier.PUBLIC);
 
         /*
           Adding the extends class
@@ -93,10 +94,20 @@ public class OwnerClass {
                 .addParameter(listenerType, "data")
                 .addStatement("super(data)");
 
+        for (String id : receiverMethods.keySet()) {
+            List<AnnotatedMethod> methods = receiverMethods.get(id);
+            for (AnnotatedMethod method: methods) {
+                if(method.isSticky()){
+                    constructor.addStatement("stickySubscriptions.add($S)", method.getNotificationId());
+                }else{
+                    constructor.addStatement("subscriptions.add($S)", method.getNotificationId());
+                }
+            }
+        }
         builder.addMethod(constructor.build());
 
         /*
-          A dummy method for now which overrrides the abstract method
+          Handle notification method is ovveriden to deliver notification to particular methods.
          */
         MethodSpec.Builder handleNotification = MethodSpec.methodBuilder("handleNotification")
                 .addModifiers(Modifier.PUBLIC)
@@ -105,7 +116,10 @@ public class OwnerClass {
         handleNotification.beginControlFlow("switch(id)");
         for (String id : receiverMethods.keySet()) {
             handleNotification.addCode("case $S:\n", id);
-            
+            List<AnnotatedMethod> methods = receiverMethods.get(id);
+            for (AnnotatedMethod method: methods) {
+                handleNotification.addCode(method.getCode());
+            }
             handleNotification.addStatement("break");
         }
         handleNotification.endControlFlow();
