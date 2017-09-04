@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.shrikanth.com.bulletapi.Subscribe;
+import com.shrikanth.com.notificationsample.models.Constants;
 import com.shrikanth.com.notificationsample.models.User;
 
 public class MainActivity extends BaseActivity {
@@ -50,13 +51,18 @@ public class MainActivity extends BaseActivity {
         return null;
     }
 
-    @Subscribe(id ="complexObject", sticky = true)
+    @Subscribe(id = Constants.X, sticky = true)
     public Object onSing(User complex){
         return null;
     }
 
     @Subscribe(id ="Onprimitive", sticky = true)
     public Object onPrimitive(int prim){
+        return null;
+    }
+
+    @Subscribe(id ="sriram")
+    public Object onSriramSinging(int prim){
         return null;
     }
 
