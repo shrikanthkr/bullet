@@ -30,6 +30,9 @@ public abstract class NotificationReceiver<T> {
         return subscriptions;
     }
 
+    Event getEvent(String id){
+        return subscriptions.get(id);
+    }
 
     boolean isSticky(String id){
         return subscriptions.containsKey(id) && subscriptions.get(id).isSticky();

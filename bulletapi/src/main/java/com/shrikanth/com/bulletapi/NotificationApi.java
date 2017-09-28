@@ -69,11 +69,13 @@ public class NotificationApi {
     }
 
     public static void notify(String id, Object data){
-        if( mSubscribersByNotificationId.containsKey(id)){
-            HashSet<String> subscribers = mSubscribersByNotificationId.get(id);
-            for (String subscriberId : subscribers) {
-                Subscriber subscriber = mSubscribersByID.get(subscriberId);
-                subscriber.notify(id, data);
+        synchronized (mLock) {
+            if (mSubscribersByNotificationId.containsKey(id)) {
+                HashSet<String> subscribers = mSubscribersByNotificationId.get(id);
+                for (String subscriberId : subscribers) {
+                    Subscriber subscriber = mSubscribersByID.get(subscriberId);
+                    subscriber.notify(id, data);
+                }
             }
         }
     }

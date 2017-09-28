@@ -1,69 +1,82 @@
 package com.shrikanth.com.notificationsample;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
+import com.shrikanth.com.bulletapi.NotificationApi;
 import com.shrikanth.com.bulletapi.Subscribe;
+import com.shrikanth.com.bulletapi.ThreadMode;
 import com.shrikanth.com.notificationsample.models.Constants;
 import com.shrikanth.com.notificationsample.models.User;
 
 public class MainActivity extends BaseActivity {
 
     User s = new User();
+    Button main, post, async;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        startActivity(new Intent(this, SecondActivity.class));
+        main = (Button)findViewById(R.id.main_thread);
+        post = (Button)findViewById(R.id.post);
+        async = (Button)findViewById(R.id.async);
+        main.setOnClickListener(mainClickListener);
+        async.setOnClickListener(asyncClick);
+        post.setOnClickListener(postClick);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        MockNotifications.mock();
     }
 
     private void callUserCheck(User u){}
 
-    @Subscribe(id ="login")
+    @Subscribe(id ="login", threadMode = ThreadMode.MAIN)
     public void onLogin(final String message){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    @Subscribe(id ="login")
-    public void somthingElse(final String message){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-            }
-        });
+            Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
     }
 
     @Subscribe(id ="sing")
-    public Object onSing(String songId){
-        return null;
+    public void onSing(String songId){
+        Toast.makeText(MainActivity.this, songId, Toast.LENGTH_LONG).show();
     }
 
     @Subscribe(id = Constants.X, sticky = true)
-    public Object onSing(User complex){
-        return null;
+    public void onSing(User complex){
+
     }
 
-    @Subscribe(id ="Onprimitive", sticky = true)
-    public Object onPrimitive(int prim){
-        return null;
+    @Subscribe(id ="Onprimitive", threadMode = ThreadMode.ASYNC)
+    public void onPrimitive(int prim){
+        Log.d("ASYNC", prim+"");
     }
 
-    @Subscribe(id ="sriram")
-    public Object onSriramSinging(int prim){
-        return null;
-    }
+
+    private View.OnClickListener mainClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            NotificationApi.notify("login", "Posting on Main Thread");
+        }
+    };
+
+    private View.OnClickListener asyncClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            for(int i=0;i<10;i++) {
+                NotificationApi.notify("Onprimitive", 5);
+            }
+        }
+    };
+
+    private View.OnClickListener postClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+                NotificationApi.notify("sing", "songId");
+        }
+    };
 
 }

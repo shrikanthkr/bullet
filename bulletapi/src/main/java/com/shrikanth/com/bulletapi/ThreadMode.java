@@ -6,5 +6,6 @@ package com.shrikanth.com.bulletapi;
 
 public enum ThreadMode {
     POST,
-    HANDLER
+    MAIN,
+    ASYNC
 }
