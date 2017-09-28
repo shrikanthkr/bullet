@@ -1,6 +1,7 @@
 package com.shrikanth.com.bulletapi;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by shrikanth on 8/20/17.
@@ -8,26 +9,29 @@ import java.util.HashSet;
 
 public abstract class NotificationReceiver<T> {
     protected T listener;
-    protected HashSet<String> subscriptions;
-    protected HashSet<String> stickySubscriptions;
+    protected Map<String, Event> subscriptions;
 
     public NotificationReceiver(T listener) {
         this.listener = listener;
-        this.subscriptions = new HashSet<>();
-        this.stickySubscriptions = new HashSet<>();
+        subscriptions = new HashMap<>();
+    }
+
+    void setListener(T listener) {
+        this.listener = listener;
+    }
+
+    void removeListener(){
+        listener = null;
     }
 
     public abstract void handleNotification(String id, Object data);
 
-    public HashSet<String> getSubscriptions(){
+    Map<String, Event> getSubscriptions(){
         return subscriptions;
     }
 
-    public HashSet<String> getStickySubscriptions() {
-        return stickySubscriptions;
-    }
 
-    public boolean isSticky(String id){
-        return  stickySubscriptions.contains(id);
+    boolean isSticky(String id){
+        return subscriptions.containsKey(id) && subscriptions.get(id).isSticky();
     }
 }

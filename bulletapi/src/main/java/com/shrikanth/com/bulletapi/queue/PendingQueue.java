@@ -3,14 +3,15 @@ package com.shrikanth.com.bulletapi.queue;
 /**
  * Created by shrikanth on 9/3/17.
  */
-public class PendingQueue {
-    PendingTask head;
-    PendingTask tail;
+class PendingQueue {
+    private PendingTask head;
+    private PendingTask tail;
 
-    public PendingQueue() {
+    PendingQueue() {
+
     }
 
-    public synchronized void enqueue(Task task){
+    synchronized void enqueue(Task task){
         PendingTask pendingTask = new PendingTask(task);
         if(tail != null){
             tail.next = pendingTask;
@@ -20,15 +21,13 @@ public class PendingQueue {
         }
         notify();
     }
-    public synchronized PendingTask poll() throws InterruptedException{
+    synchronized PendingTask poll(){
         PendingTask pendingTask = head;
         if(head != null){
             head = head.next;
             if(head == null){
                 tail = null;
             }
-        }else{
-            wait();
         }
         return pendingTask;
     }

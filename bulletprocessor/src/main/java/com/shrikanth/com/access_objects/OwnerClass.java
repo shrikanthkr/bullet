@@ -97,10 +97,7 @@ public class OwnerClass {
         for (String id : receiverMethods.keySet()) {
             List<AnnotatedMethod> methods = receiverMethods.get(id);
             for (AnnotatedMethod method: methods) {
-                if(method.isSticky()){
-                    constructor.addStatement("stickySubscriptions.add($S)", method.getNotificationId());
-                }
-                constructor.addStatement("subscriptions.add($S)", method.getNotificationId());
+                constructor.addStatement("subscriptions.put($S, $L)", method.getNotificationId(), getEventStatement(method));
             }
         }
         builder.addMethod(constructor.build());
@@ -117,7 +114,7 @@ public class OwnerClass {
             handleNotification.addCode("case $S:\n", id);
             List<AnnotatedMethod> methods = receiverMethods.get(id);
             for (AnnotatedMethod method: methods) {
-                handleNotification.addCode(method.getCode());
+                handleNotification.addCode(method.getNotifierCode());
             }
             handleNotification.addStatement("break");
         }
@@ -133,5 +130,9 @@ public class OwnerClass {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String getEventStatement(AnnotatedMethod method){
+        return method.getEventGenerationCode();
     }
 }

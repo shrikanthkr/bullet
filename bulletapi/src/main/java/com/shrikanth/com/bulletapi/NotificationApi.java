@@ -19,7 +19,7 @@ public class NotificationApi {
     /*
     Avoid exposing the constructor for initialization
     */
-    private void NotificationApi(){
+    private NotificationApi(){
 
     }
 
@@ -81,9 +81,10 @@ public class NotificationApi {
 
 
     private void addByNotificationIds(Subscriber subscriber){
-        HashSet<String> subscriptions = subscriber.getSubscriptions();
-        for(String id : subscriptions){
+        Map<String, Event> subscriptions = subscriber.getSubscriptions();
+        for (Map.Entry<String, Event> entry : subscriptions.entrySet()) {
             HashSet<String> subscriberIds;
+            String id = entry.getKey();
             if(mSubscribersByNotificationId.containsKey(id)){
                 subscriberIds = mSubscribersByNotificationId.get(id);
             }else{

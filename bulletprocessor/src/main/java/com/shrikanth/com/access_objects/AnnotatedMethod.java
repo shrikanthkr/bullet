@@ -1,7 +1,9 @@
 package com.shrikanth.com.access_objects;
 
 
+import com.shrikanth.com.bulletapi.Event;
 import com.shrikanth.com.bulletapi.Subscribe;
+import com.shrikanth.com.bulletapi.ThreadMode;
 import com.squareup.javapoet.CodeBlock;
 
 import java.util.List;
@@ -16,12 +18,11 @@ import javax.lang.model.type.TypeMirror;
 
 public class AnnotatedMethod {
 
-    Element element;
-    ExecutableType executableType;
-    String methodName;
-    Subscribe annotation;
-    //String[] params;
-    List<? extends TypeMirror> parameterTypes;
+    private Element element;
+    private ExecutableType executableType;
+    private String methodName;
+    private Subscribe annotation;
+    private List<? extends TypeMirror> parameterTypes;
 
     public AnnotatedMethod(Element element) {
         if(element.asType() instanceof ExecutableType) {
@@ -34,19 +35,32 @@ public class AnnotatedMethod {
     }
 
 
-    public String getNotificationId() {
+    String getNotificationId() {
         return annotation.id();
     }
 
-    public boolean isSticky(){
+    private boolean isSticky(){
         return annotation.sticky();
+    }
+
+    public ThreadMode getThreadMode(){
+        return annotation.threadMode();
     }
 
     public String getMethodName() {
         return methodName;
     }
 
-    public String getCode(){
+    public String getEventGenerationCode(){
+        CodeBlock.Builder codeBlock = CodeBlock.builder();
+        codeBlock.add("new $T($S, $T.$L, $L)", Event.class,
+                this.getNotificationId(),
+                ThreadMode.class,
+                this.getThreadMode(),
+                this.isSticky());
+        return codeBlock.build().toString();
+    }
+    public String getNotifierCode(){
         CodeBlock.Builder codeBlock = CodeBlock.builder();
         if(parameterTypes != null && parameterTypes.size() > 0) {
             TypeMirror parameter  = parameterTypes.get(0);

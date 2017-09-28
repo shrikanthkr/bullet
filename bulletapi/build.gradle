@@ -1,6 +1,7 @@
 apply plugin: 'java'
 
 dependencies {
+    compileOnly group: 'com.google.android', name: 'android', version: '1.6_r2'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.squareup:javapoet:1.8.0'
 }

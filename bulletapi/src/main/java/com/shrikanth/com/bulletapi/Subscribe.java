@@ -15,4 +15,5 @@ import java.lang.annotation.Target;
 public @interface Subscribe {
     String id();
     boolean sticky() default false;
+    ThreadMode threadMode() default ThreadMode.POST;
 }

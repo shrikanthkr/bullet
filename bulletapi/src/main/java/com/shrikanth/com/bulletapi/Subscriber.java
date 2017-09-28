@@ -1,9 +1,13 @@
 package com.shrikanth.com.bulletapi;
 
+import android.os.Looper;
+
+import com.shrikanth.com.bulletapi.queue.HandlerExecutor;
+import com.shrikanth.com.bulletapi.queue.Task;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -12,9 +16,9 @@ import java.util.Map;
 
 class Subscriber {
     private String id;
-    private Object subscriberInstance;
     private NotificationReceiver notificationReceiver;
     private static final String SUFFIX = "$$NotificationReceiver";
+    private static final HandlerExecutor handlerExecutor = new HandlerExecutor(Looper.getMainLooper());
     private enum STATE{
         INIT, ALIVE, PAUSED, DESTROYED
     }
@@ -24,7 +28,6 @@ class Subscriber {
     Subscriber(String id, Object subscriberInstance) {
         this.currentState = STATE.INIT;
         this.id = id;
-        this.subscriberInstance = subscriberInstance;
         this.pendingEvents = new HashMap<>();
         String className = subscriberInstance.getClass().getCanonicalName() + SUFFIX;
         Class clazz = null;
@@ -43,7 +46,7 @@ class Subscriber {
         this.currentState = STATE.ALIVE;
     }
 
-    HashSet getSubscriptions(){
+    Map<String, Event> getSubscriptions(){
         return notificationReceiver.getSubscriptions();
     }
 
@@ -52,17 +55,11 @@ class Subscriber {
     }
 
     void notify(String id, Object data){
-        if(this.currentState == STATE.ALIVE) {
-            notificationReceiver.handleNotification(id, data);
-        }else{
-            if(notificationReceiver.isSticky(id)) {
-                pendingEvents.put(id, data);
-            }
-        }
+        postToReceiver(id, data);
     }
 
     void bindSubscriber(Object subscriberInstance) {
-        this.subscriberInstance = subscriberInstance;
+        notificationReceiver.setListener(subscriberInstance);
         currentState = STATE.ALIVE;
     }
 
@@ -73,13 +70,27 @@ class Subscriber {
     }
     void unregister(){
         this.currentState = STATE.PAUSED;
-        subscriberInstance = null;
     }
 
     void destroy(){
         this.currentState = STATE.DESTROYED;
-        subscriberInstance = null;
-        notificationReceiver = null;
+        notificationReceiver.removeListener();
+    }
+
+    private void postToReceiver(final String id, final Object data){
+
+        handlerExecutor.enqueue(new Task() {
+            @Override
+            public void execute() {
+                if(currentState == STATE.ALIVE) {
+                    notificationReceiver.handleNotification(id, data);
+                }else{
+                    if(notificationReceiver.isSticky(id)) {
+                        pendingEvents.put(id, data);
+                    }
+                }
+            }
+        });
     }
 
 }
