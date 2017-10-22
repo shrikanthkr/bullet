@@ -1,8 +1,8 @@
-##Beta 0.1 - Broadcast Helper
+# Beta 0.1 - Broadcast Helper
 
 Annotated Methods and Notification helpers for android. This library helps keep you notification receiver code clean and simple.
 
-##Usage:
+# Usage:
 
 --- 
 
@@ -102,7 +102,7 @@ public class POJOJava{
   - ASYNC - runs asynchronously on a separate thread
   
   
-##TODO's
+## TODO's
 
 - Cleanup threads and make the architecture more robust
 - Add android architecture components for easy usage
