@@ -5,7 +5,27 @@ Annotated Methods and Notification helpers for android. This library helps keep 
 # Usage:
 
 --- 
-
+> Including it in your applications
+ - Copy bulletapi and bulletpricessor folders to your project(Better to use your navigator)
+ - add in settings.gradle
+ ``` include ':app', ':bulletprocessor', ':bulletapi' ```
+ - add dependency on app/build.gradle
+ ```
+    apply plugin: 'com.neenbedankt.android-apt'
+    buildscript {
+        repositories{
+            mavenCentral()
+        }
+        dependencies{
+            classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+        }
+    }
+    dependencies {
+        ... other dependencies ...
+        compile project(':bulletapi')
+        apt project(':bulletprocessor')
+    }
+ ```
 > Register your notification api in the base class
 
 
@@ -113,6 +133,7 @@ public class POJOJava{
 - Add android architecture components for easy usage
 - Make subscriptions sticky by default, if the receiver is on main thread
 
+> Feel free to contribute and raise a PR
 
 
 ## License - MIT
