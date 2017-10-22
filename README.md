@@ -115,7 +115,7 @@ public class POJOJava{
 
 ```
 
-> Firiing Notifications
+> Firing Notifications
 
 ```
  NotificationApi.notify("login", "Posting on Main Thread");
