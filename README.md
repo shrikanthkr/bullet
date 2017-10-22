@@ -1,4 +1,4 @@
-##Beta 0.1
+##Beta 0.1 - Broadcast Helper
 
 Annotated Methods and Notification helpers for android. This library helps keep you notification receiver code clean and simple.
 
